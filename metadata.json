@@ -1,0 +1,7 @@
+{
+  "name": "StudentPilot – Personal AI Student Assistant",
+  "description": "Personal AI academic and career assistant for students to manage placement prep, exams, online courses, DSA practice, schedules, and revision.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
