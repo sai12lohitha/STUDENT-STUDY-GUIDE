@@ -211,7 +211,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
             >
               <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
-              <span>Ask AI Alternative</span>
+              <span>Ask n8n AI Assistant</span>
             </button>
           </div>
         </div>

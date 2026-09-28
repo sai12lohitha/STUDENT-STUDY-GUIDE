@@ -119,15 +119,15 @@ function MainAppContent() {
       {/* Floating Bottom-Right AI Assistant Trigger */}
       <button
         onClick={() => setAiChatOpen(true)}
-        className="fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded-2xl bg-indigo-600 px-4 py-3 text-xs font-bold text-white shadow-xl shadow-indigo-600/30 transition hover:scale-105 hover:bg-indigo-500 focus:outline-none dark:bg-indigo-500 dark:hover:bg-indigo-600"
-        title="Open AI Study Assistant"
+        className="fixed bottom-5 right-5 z-30 flex items-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-700 to-violet-700 px-4 py-3 text-xs font-bold text-white shadow-xl shadow-indigo-600/30 transition hover:scale-105 hover:from-indigo-500 hover:to-violet-600 focus:outline-none dark:from-indigo-500 dark:to-violet-600"
+        title="Open n8n AI Study Assistant"
       >
-        <span className="relative flex h-3 w-3">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-300 opacity-75"></span>
-          <span className="relative inline-flex h-3 w-3 rounded-full bg-white"></span>
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
         </span>
         <Bot className="h-4 w-4" />
-        <span className="hidden sm:inline">Ask StudentPilot AI</span>
+        <span className="hidden sm:inline">Ask n8n AI Assistant</span>
       </button>
 
       {/* Floating Button to switch to Landing Page preview */}

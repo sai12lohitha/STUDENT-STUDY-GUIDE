@@ -159,9 +159,93 @@ Active Goals: ${JSON.stringify((goals || []).map((g: any) => ({ name: g.name, pr
   res.json({ success: true, data: fallback, source: 'smart-engine' });
 });
 
-// Endpoint: AI Chatbot Assistant
+// Default n8n webhook endpoint for StudentPilot AI Assistant
+const DEFAULT_N8N_WEBHOOK = 'https://sailohitha.app.n8n.cloud/webhook/b5baae03-8d83-4cad-a84b-2ef854747698/chat';
+
+async function queryN8nWebhook(
+  webhookUrl: string,
+  chatInput: string,
+  sessionId?: string,
+  context?: any,
+  timeoutMs = 28000
+): Promise<string> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/plain, */*',
+      },
+      body: JSON.stringify({
+        chatInput,
+        message: chatInput,
+        sessionId: sessionId || 'studentpilot-user',
+        context,
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      throw new Error(`n8n webhook responded with HTTP ${res.status}`);
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const data: any = await res.json();
+      if (typeof data === 'string') return data;
+      if (data.output) return data.output;
+      if (data.text) return data.text;
+      if (data.response) return data.response;
+      if (data.message) return data.message;
+      if (data.reply) return data.reply;
+      if (Array.isArray(data) && data[0]?.output) return data[0].output;
+      return JSON.stringify(data);
+    } else {
+      const text = await res.text();
+      return text;
+    }
+  } catch (err) {
+    clearTimeout(timer);
+    throw err;
+  }
+}
+
+// Endpoint: n8n AI Assistant Proxy
+app.post(['/api/n8n/chat', '/n8n/chat'], async (req, res) => {
+  const { message, chatInput, sessionId, webhookUrl, context } = req.body;
+  const input = chatInput || message || '';
+  const url = webhookUrl || process.env.N8N_WEBHOOK_URL || DEFAULT_N8N_WEBHOOK;
+
+  try {
+    const reply = await queryN8nWebhook(url, input, sessionId, context);
+    return res.json({ success: true, reply, source: 'n8n' });
+  } catch (err: any) {
+    console.warn('n8n proxy error, attempting fallback:', err?.message);
+    return res.status(502).json({ success: false, error: err?.message });
+  }
+});
+
+// Endpoint: AI Chatbot Assistant (supports n8n & Gemini with dual fallback)
 app.post(['/api/gemini/chat', '/gemini/chat'], async (req, res) => {
-  const { message, history, context } = req.body;
+  const { message, history, context, preferN8n = true, sessionId, webhookUrl } = req.body;
+
+  // Try n8n first if preferred
+  if (preferN8n !== false) {
+    try {
+      const url = webhookUrl || process.env.N8N_WEBHOOK_URL || DEFAULT_N8N_WEBHOOK;
+      const n8nReply = await queryN8nWebhook(url, message, sessionId, context, 15000);
+      if (n8nReply && n8nReply.trim()) {
+        return res.json({ success: true, reply: n8nReply, source: 'n8n' });
+      }
+    } catch (n8nErr: any) {
+      console.warn('n8n failed in chat endpoint, trying Gemini fallback:', n8nErr?.message);
+    }
+  }
 
   if (ai) {
     try {

@@ -223,4 +223,5 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  source?: 'n8n' | 'gemini' | 'system';
 }
