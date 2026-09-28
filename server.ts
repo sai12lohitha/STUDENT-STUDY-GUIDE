@@ -102,7 +102,7 @@ function getFallbackPlan(prompt: string, context?: any) {
 }
 
 // Endpoint: AI Study Planner
-app.post('/api/gemini/plan', async (req, res) => {
+app.post(['/api/gemini/plan', '/gemini/plan'], async (req, res) => {
   const { prompt, profile, goals, exams, courses, dsa } = req.body;
 
   if (ai) {
@@ -160,7 +160,7 @@ Active Goals: ${JSON.stringify((goals || []).map((g: any) => ({ name: g.name, pr
 });
 
 // Endpoint: AI Chatbot Assistant
-app.post('/api/gemini/chat', async (req, res) => {
+app.post(['/api/gemini/chat', '/gemini/chat'], async (req, res) => {
   const { message, history, context } = req.body;
 
   if (ai) {
@@ -287,7 +287,7 @@ You can ask me to:
 });
 
 // Endpoint: AI Daily Summary
-app.post('/api/gemini/summary', async (req, res) => {
+app.post(['/api/gemini/summary', '/gemini/summary'], async (req, res) => {
   const { completedTasks, studyHours, dsaSolved, streak, missedTasks } = req.body;
 
   if (ai) {
@@ -349,4 +349,10 @@ async function startServer() {
   });
 }
 
-startServer();
+// In local / standard server environments, launch the server.
+// In Vercel serverless environments, VERCEL is set and the app is handled via serverless functions.
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;
